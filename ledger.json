@@ -1,0 +1,29 @@
+{
+    "schema": "opschief-ledger/1",
+    "account": {
+        "name": "Operations Chief - Paper",
+        "starting_capital": 1000,
+        "start_date": "2026-11-20",
+        "currency": "USD",
+        "demo": false
+    },
+    "rules": {
+        "ticker": "PLTR",
+        "callers": [
+            "FOUNDRY",
+            "COMPASS",
+            "JACK"
+        ],
+        "consensus": "unanimous",
+        "entry_time_et": "09:32",
+        "exit_time_et": "15:52",
+        "fill_price": "close of the 1-minute bar ending at the entry/exit time",
+        "price_source": "Yahoo Finance 1-minute bars via yfinance (bar timestamp = start of the minute; the bar ending 09:32 ET is labeled 09:31 ET; fill is that bar's close)",
+        "slippage_per_share": 0.01,
+        "commission_per_side": 0,
+        "sizing": "whole shares, floor(equity / entry price), long or short, no leverage",
+        "hit_threshold": 0.01
+    },
+    "updated_at": "2026-11-20T00:00:00Z",
+    "sessions": []
+}

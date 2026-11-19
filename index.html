@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self' https:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Paper Desk">
+<meta name="theme-color" content="#0f1720">
+<title>Ops Chief Paper Desk</title>
+<style>
+:root{--bg:#0f1720;--card:#17212d;--line:#263445;--tx:#e6edf3;--mu:#8fa1b3;--gr:#2ecc71;--rd:#ff5d5d;--am:#f5b942;--bl:#4aa3ff;--pu:#b48cff}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+header{position:sticky;top:0;z-index:5;background:rgba(15,23,32,.96);border-bottom:1px solid var(--line);padding:10px 14px}
+.hrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1{font-size:17px;margin:0;flex:1 1 auto}
+.pill{font-size:12px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:999px;border:1px solid}
+.pill.LIVE{color:var(--gr);border-color:var(--gr)}
+.pill.DEMO{color:var(--pu);border-color:var(--pu)}
+.pill.CACHED{color:var(--am);border-color:var(--am)}
+.pill.STALE{color:#fff;background:var(--rd);border-color:var(--rd)}
+.pill.NONE{color:var(--mu);border-color:var(--mu)}
+.sub{color:var(--mu);font-size:12px;margin-top:4px}
+main{padding:12px;max-width:720px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:0 0 10px}
+.banner{border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+.banner.demo{background:rgba(180,140,255,.14);border:1px solid var(--pu)}
+.banner.warn{background:rgba(245,185,66,.12);border:1px solid var(--am)}
+.banner.bad{background:rgba(255,93,93,.12);border:1px solid var(--rd)}
+.big{font-size:34px;font-weight:700;letter-spacing:-.01em}
+.pos{color:var(--gr)}.neg{color:var(--rd)}.mu{color:var(--mu)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.kv{background:rgba(255,255,255,.03);border-radius:10px;padding:8px 10px}
+.kv .k{font-size:12px;color:var(--mu)}.kv .v{font-size:18px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:right;padding:6px 4px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+th{color:var(--mu);font-weight:600}
+.flag{border-left:3px solid;padding:6px 8px;margin:6px 0;border-radius:6px;background:rgba(255,255,255,.03);font-size:13px}
+.flag.critical{border-color:var(--rd)}.flag.serious{border-color:var(--am)}.flag.warning{border-color:var(--bl)}
+.sev{font-size:11px;font-weight:700;text-transform:uppercase;margin-right:6px}
+.critical .sev{color:var(--rd)}.serious .sev{color:var(--am)}.warning .sev{color:var(--bl)}
+.ok{color:var(--gr);font-weight:600}
+.sess{border-top:1px solid var(--line);padding:10px 0}
+.sess:first-of-type{border-top:0}
+.sess .t{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.sess .d{color:var(--mu);font-size:13px;margin-top:3px}
+.tag{font-size:11px;padding:1px 6px;border-radius:6px;border:1px solid var(--line);margin-left:4px}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+input[type=url],input[type=text]{width:100%;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0b121a;color:var(--tx)}
+input[type=file]{font-size:14px;color:var(--tx);max-width:100%}
+button{font-size:15px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#22303f;color:var(--tx);margin:8px 8px 0 0;min-height:44px}
+button.primary{background:var(--bl);border-color:var(--bl);color:#04121f;font-weight:700}
+details summary{cursor:pointer;font-weight:600;min-height:32px}
+.small{font-size:12px;color:var(--mu)}
+code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <h1>Ops Chief Paper Desk</h1>
+    <span id="pill" class="pill NONE" data-testid="pill">…</span>
+    <span id="stale" class="pill STALE" data-testid="stale" hidden>STALE</span>
+  </div>
+  <div class="sub" id="srcline" data-testid="srcline">Loading…</div>
+</header>
+<main>
+  <div id="banners"></div>
+  <section class="card" id="hero" data-testid="hero"></section>
+  <section class="card" id="integrity" data-testid="integrity"></section>
+  <section class="card" id="edge" data-testid="edge"></section>
+  <section class="card" id="baselines" data-testid="baselines"></section>
+  <section class="card" id="sessions" data-testid="sessions"></section>
+  <section class="card" id="settings" data-testid="settings">
+    <details id="settingsDetails">
+      <summary>Settings</summary>
+      <label for="url">Ledger URL</label>
+      <input id="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="./ledger.json">
+      <div class="small">Default <code>./ledger.json</code> (same folder as this page). A ledger on another host must send <code>Access-Control-Allow-Origin</code>.</div>
+      <button class="primary" id="saveLoad" type="button">Save &amp; load live ledger</button>
+      <button id="refreshNow" type="button">Refresh now</button>
+      <label for="file">Open file (e.g. ledger.example.json)</label>
+      <input id="file" type="file" accept=".json,application/json">
+      <div class="small">Opening a file shows it on this phone only and pauses auto-refresh until you tap “Save &amp; load live ledger”.</div>
+      <button id="resetUrl" type="button">Reset URL to ./ledger.json</button>
+      <button id="clearStore" type="button">Clear stored data</button>
+      <p class="small" id="storageNote">Stored on this phone (localStorage): the ledger URL and the last good copy of the ledger, so the app can show it as CACHED if a check fails. Opened files are not stored. The app is read-only: it only reads the ledger, never writes it, holds no credentials, and sends nothing anywhere.</p>
+    </details>
+  </section>
+  <section class="card" id="about">
+    <h2>Rules used for the arithmetic</h2>
+    <div class="small" id="rulesNote"></div>
+  </section>
+</main>
+<script>
+(function(){
+'use strict';
+var SCHEMA='opschief-ledger/1';
+var NY='America/New_York', BER='Europe/Berlin';
+var REFRESH_MS=60000;
+var K_SET='opschiefDesk.settings.v1', K_CACHE='opschiefDesk.lastGood.v1';
+var DEFAULT_URL='./ledger.json';
+var DEFAULT_CALLERS=['FOUNDRY','COMPASS','JACK'];
+// Pinned rules (R5-R8). Only Connor changes them.
+var SLIP_C=1;            // $0.01 per share, against you
+var FEES_C=0;            // commission $0
+var ENTRY_ET='09:32', EXIT_ET='15:52', EARLY_EXIT_ET='12:52', LOCK_ET='09:30';
+// Section 8 calendar (NYSE, through 1 Jan 2027). Beyond this, weekdays are assumed to be trading days.
+var CLOSED={'2026-11-26':1,'2026-12-25':1,'2027-01-01':1};
+var EARLY={'2026-11-27':1,'2026-12-24':1};
+var CAL_END='2027-01-01';
+
+var state={data:null,source:null,fresh:false,lastError:null,lastCheck:null,lastGood:null,url:DEFAULT_URL,fileName:null,fetchCount:0};
+window.__opschief=state;
+
+// ---------- storage ----------
+function lsGet(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+
+// ---------- time ----------
+var fmtCache={};
+function parts(ms,tz){
+  var f=fmtCache[tz]||(fmtCache[tz]=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short'}));
+  var o={};f.formatToParts(new Date(ms)).forEach(function(p){o[p.type]=p.value});
+  return {y:+o.year,mo:+o.month,d:+o.day,h:(+o.hour)%24,mi:+o.minute,s:+o.second,wd:o.weekday};
+}
+function offMin(ms,tz){var p=parts(ms,tz);return (Date.UTC(p.y,p.mo-1,p.d,p.h,p.mi,p.s)-Math.floor(ms/1000)*1000)/60000}
+function nyToUtc(dateStr,hhmm){
+  var a=dateStr.split('-').map(Number),b=hhmm.split(':').map(Number);
+  var guess=Date.UTC(a[0],a[1]-1,a[2],b[0],b[1]);
+  var t=guess-offMin(guess,NY)*60000;
+  return guess-offMin(t,NY)*60000;
+}
+function pad(n){return (n<10?'0':'')+n}
+function ymd(p){return p.y+'-'+pad(p.mo)+'-'+pad(p.d)}
+function nyDate(ms){return ymd(parts(ms,NY))}
+function hhmm(ms,tz){var p=parts(ms,tz);return pad(p.h)+':'+pad(p.mi)}
+function berlin(ms){if(ms==null||isNaN(ms))return '—';var p=parts(ms,BER);return p.wd+' '+p.d+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][p.mo-1]+' '+pad(p.h)+':'+pad(p.mi)+' Berlin'}
+function berlinT(ms){return isNaN(ms)?'—':hhmm(ms,BER)+' Berlin'}
+function iso(s){if(typeof s!=='string')return NaN;var t=Date.parse(s);return t}
+function isDateStr(s){return typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)}
+function isTradingDay(d){var a=d.split('-').map(Number);var wd=new Date(Date.UTC(a[0],a[1]-1,a[2])).getUTCDay();return wd!==0&&wd!==6&&!CLOSED[d]}
+function exitEt(r){if(r&&typeof r.exit_time_et==='string'&&/^\d{2}:\d{2}$/.test(r.exit_time_et))return r.exit_time_et;return EARLY[r.date]?EARLY_EXIT_ET:EXIT_ET}
+
+// ---------- money ----------
+function isNum(x){return typeof x==='number'&&isFinite(x)}
+function cents(x){return Math.round(x*100)}
+function usd(c,signed){var s=(Math.abs(c)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});var sg=c<0?'−':(signed&&c>0?'+':'');return sg+'$'+s}
+function cls(c){return c>0?'pos':(c<0?'neg':'')}
+function pct(x,dp){return (x*100).toFixed(dp==null?1:dp)+'%'}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+// ---------- validation ----------
+function validate(obj){
+  if(!obj||typeof obj!=='object'||Array.isArray(obj))return 'not a JSON object';
+  if(obj.schema!==SCHEMA)return 'schema is not "'+SCHEMA+'"';
+  if(!obj.account||typeof obj.account!=='object')return 'missing account';
+  if(!Array.isArray(obj.sessions))return 'sessions is not an array';
+  return null;
+}
+
+// ---------- engine ----------
+function callersOf(d){var c=d.rules&&Array.isArray(d.rules.callers)?d.rules.callers.filter(function(x){return typeof x==='string'&&x}):[];return c.length?c:DEFAULT_CALLERS.slice()}
+function consensus(r,callers){
+  var calls=r.calls&&typeof r.calls==='object'?r.calls:{};
+  var up=0,dn=0;callers.forEach(function(c){if(calls[c]==='UP')up++;else if(calls[c]==='DOWN')dn++});
+  return {uni:up===callers.length?1:(dn===callers.length?-1:0),up:up,dn:dn};
+}
+function sideOf(a){return a==='LONG'?1:(a==='SHORT'?-1:0)}
+
+function analyze(d,nowMs){
+  var callers=callersOf(d);
+  var startC=isNum(d.account.starting_capital)?cents(d.account.starting_capital):100000;
+  var today=nyDate(nowMs);
+  var rows=d.sessions.map(function(r,i){return {r:(r&&typeof r==='object')?r:{},i:i}});
+  rows.sort(function(a,b){var x=String(a.r.date||''),y=String(b.r.date||'');return x<y?-1:(x>y?1:a.i-b.i)});
+  var flags=[],seen={},eqC=startC,closed=[],open=[],out=[];
+  function add(row,code,sev,msg){flags.push({date:row.r.date||'(no date)',code:code,sev:sev,msg:msg,idx:row.i})}
+  rows.forEach(function(row){
+    var r=row.r,date=isDateStr(r.date)?r.date:null,res={r:r,flags:[],actualC:null,unrealC:null,eqBefore:eqC};
+    var nf=flags.length;
+    var key=(r.date||'')+'|'+(r.ticker||'');
+    if(seen[key])add(row,'DUPLICATE','serious','Second row for '+(r.date||'?')+' '+(r.ticker||'?'));
+    seen[key]=1;
+    // lock time
+    var lock=iso(r.calls_locked_at);
+    if(!r.calls_locked_at||isNaN(lock))add(row,'NO_LOCK_TIME','warning','calls_locked_at missing or not a timestamp');
+    else if(date&&lock>=nyToUtc(date,LOCK_ET))add(row,'LATE_CALLS','critical','Calls locked '+berlin(lock)+' ('+hhmm(lock,NY)+' ET), at or after 09:30 ET: possible lookahead');
+    var calls=r.calls&&typeof r.calls==='object'?r.calls:{};
+    callers.forEach(function(c){var v=calls[c];if(v!=='UP'&&v!=='DOWN')add(row,'NO_CALL','warning',c+' has no UP/DOWN call ('+(v==null?'missing':JSON.stringify(v))+')')});
+    var cons=consensus(r,callers),side=sideOf(r.action),st=r.status;
+    res.uni=cons.uni;
+    if(side&&!cons.uni)add(row,'NO_CONSENSUS_TRADE','critical',r.action+' taken without a unanimous call ('+cons.up+' UP / '+cons.dn+' DOWN)');
+    if(side&&cons.uni&&side!==cons.uni)add(row,'WRONG_SIDE','critical',r.action+' against a unanimous '+(cons.uni>0?'UP':'DOWN')+' call');
+    if(cons.uni&&!side&&st!=='PENDING')add(row,'MISSED_TRADE','serious','Unanimous '+(cons.uni>0?'UP':'DOWN')+' call but no trade');
+    if(st!=='PENDING'&&!isNum(r.open_ref))add(row,'NO_REFS','warning','open_ref missing');
+    if((st==='CLOSED'||st==='NO_TRADE')&&!isNum(r.close_ref))add(row,'NO_REFS','warning','close_ref missing');
+    if(st==='PENDING'&&date&&date<today)add(row,'UNRESOLVED','serious','Past day still PENDING');
+    if(side&&(st==='OPEN'||st==='CLOSED')){
+      var sh=r.shares,okSh=Number.isInteger(sh)&&sh>0;
+      var ent=iso(r.entry_time),okEnt=isNum(r.entry_price)&&!isNaN(ent);
+      var ext=iso(r.exit_time),okExt=isNum(r.exit_price)&&!isNaN(ext);
+      if(!okSh)add(row,'NO_SHARES','serious','shares missing or not a whole number');
+      if(!okEnt)add(row,'NO_ENTRY','serious','entry_price / entry_time missing');
+      if(st==='CLOSED'&&!okExt)add(row,'NO_EXIT','serious','exit_price / exit_time missing');
+      if(okSh&&isNum(r.entry_price)&&sh*cents(r.entry_price)>eqC)add(row,'OVERSIZE','critical',sh+' × '+usd(cents(r.entry_price))+' = '+usd(sh*cents(r.entry_price))+' > realized equity '+usd(eqC));
+      if(okEnt&&date&&Math.abs(ent-nyToUtc(date,ENTRY_ET))>120000)add(row,'ENTRY_TIME','warning','Entry at '+berlinT(ent)+' ('+hhmm(ent,NY)+' ET); rule is '+ENTRY_ET+' ET');
+      if(st==='CLOSED'&&okExt&&date&&Math.abs(ext-nyToUtc(date,exitEt(r)))>120000)add(row,'EXIT_TIME','warning','Exit at '+berlinT(ext)+' ('+hhmm(ext,NY)+' ET); rule is '+exitEt(r)+' ET');
+      if(st==='OPEN'&&date&&date<today)add(row,'NOT_CLOSED','critical','Position still OPEN after its trading day ('+date+')');
+      if(st==='CLOSED'&&okSh&&okEnt&&okExt){
+        res.actualC=side*sh*(cents(r.exit_price)-cents(r.entry_price))-FEES_C;
+        if(isNum(r.pnl)&&Math.abs(r.pnl*100-res.actualC)>1+1e-6)add(row,'PNL_MISMATCH','serious','Ledger pnl '+usd(cents(r.pnl),true)+' vs app '+usd(res.actualC,true));
+        eqC+=res.actualC;closed.push(res);
+      }
+      if(st==='OPEN'&&okSh&&okEnt){
+        if(isNum(r.mark))res.unrealC=side*sh*(cents(r.mark)-cents(r.entry_price));
+        open.push(res);
+      }
+    }
+    res.flags=flags.slice(nf);res.eqAfter=eqC;out.push(res);
+  });
+  // rule replay (execution gap) + baselines over the same window
+  var win=out.filter(function(x){return isNum(x.r.open_ref)&&isNum(x.r.close_ref)&&(x.r.status==='CLOSED'||x.r.status==='NO_TRADE')&&!x.flags.some(function(f){return f.code==='DUPLICATE'})});
+  function sim(dirFn){
+    var e=startC,t=0,w=0,per=[];
+    win.forEach(function(x){
+      var dir=dirFn(x.r),p=null;
+      if(dir){var en=cents(x.r.open_ref)+dir*SLIP_C,ex=cents(x.r.close_ref)-dir*SLIP_C,sh=Math.floor(e/en);p=dir*sh*(ex-en);e+=p;t++;if(p>0)w++}
+      per.push({x:x,p:p});
+    });
+    return {eqC:e,pnlC:e-startC,trades:t,wins:w,per:per};
+  }
+  var rule=sim(function(r){return consensus(r,callers).uni});
+  rule.per.forEach(function(q){q.x.ruleC=q.p});
+  var actualRealC=eqC-startC;
+  // execution gap on the same window: actual closed P&L in window minus rule replay
+  var actualWinC=0;win.forEach(function(x){if(x.actualC!=null)actualWinC+=x.actualC});
+  var gapC=actualWinC-rule.pnlC;
+  out.forEach(function(x){if(x.ruleC!==undefined||x.actualC!=null){x.gapC=(x.actualC||0)-(x.ruleC||0)}});
+  var base=[{name:'Actual (ledger fills)',eqC:eqC,pnlC:actualRealC,trades:closed.length,wins:closed.filter(function(c){return c.actualC>0}).length,actual:true},
+    Object.assign({name:'Unanimous rule (replayed on refs)'},rule),
+    Object.assign({name:'Always long'},sim(function(){return 1})),
+    Object.assign({name:'Majority 2 of 3'},sim(function(r){var c=consensus(r,callers),need=Math.floor(callers.length/2)+1;return c.up>=need?1:(c.dn>=need?-1:0)}))];
+  callers.forEach(function(c){base.push(Object.assign({name:c+' alone'},sim(function(r){var v=r.calls&&r.calls[c];return v==='UP'?1:(v==='DOWN'?-1:0)})))});
+  // caller hit rates
+  var thr=d.rules&&isNum(d.rules.hit_threshold)?d.rules.hit_threshold:0.01;
+  var hits=callers.map(function(c){var h=0,n=0,flat=0,none=0;win.forEach(function(x){var v=x.r.calls&&x.r.calls[c],mv=x.r.close_ref-x.r.open_ref;if(v!=='UP'&&v!=='DOWN'){none++;return}if(Math.abs(mv)<=thr+1e-9){flat++;return}n++;if((v==='UP'&&mv>0)||(v==='DOWN'&&mv<0))h++});return {c:c,h:h,n:n,flat:flat,none:none}});
+  // stale
+  var stale=staleCheck(d,out,nowMs,today);
+  return {callers:callers,startC:startC,eqC:eqC,realC:actualRealC,closed:closed,open:open,rows:out,flags:flags,gapC:gapC,windowN:win.length,base:base,hits:hits,stale:stale,today:today,thr:thr};
+}
+
+function staleCheck(d,out,now,today){
+  var why=[];
+  var start=isDateStr(d.account.start_date)?d.account.start_date:'0000-00-00';
+  var hasToday=out.some(function(x){return x.r.date===today});
+  if(isTradingDay(today)&&today>=start&&!hasToday&&now>=nyToUtc(today,'09:35'))why.push('No row for today ('+today+') by 09:35 ET ('+berlinT(nyToUtc(today,'09:35'))+')');
+  out.forEach(function(x){
+    var r=x.r;if(!isDateStr(r.date))return;
+    if(r.status==='PENDING'&&now>=nyToUtc(r.date,'09:40'))why.push(r.date+' still PENDING at/after 09:40 ET');
+    if(r.status==='OPEN'){
+      var last=Math.max(iso(r.mark_time)||0,iso(r.entry_time)||0);
+      if(last&&now-last>3600000)why.push(r.date+' open position: no update for '+Math.floor((now-last)/60000)+' min (last '+berlinT(last)+')');
+    }
+    var closedOut=(r.status==='CLOSED'||r.status==='NO_TRADE')&&isNum(r.close_ref);
+    var dl=nyToUtc(r.date,exitEt(r))+13*60000;
+    if(!closedOut&&now>=dl)why.push(r.date+' not closed out 13 min after exit ('+berlinT(dl)+')');
+  });
+  return why;
+}
+
+// ---------- stats ----------
+var Z=1.959963984540054;
+function wilson(k,n){if(!n)return null;var p=k/n,z2=Z*Z,den=1+z2/n,c=p+z2/(2*n),m=Z*Math.sqrt(p*(1-p)/n+z2/(4*n*n));return {lo:Math.max(0,(c-m)/den),hi:Math.min(1,(c+m)/den)}}
+function lnFact(n){var s=0;for(var i=2;i<=n;i++)s+=Math.log(i);return s}
+function binomUpper(k,n){ // P(X>=k | n, 0.5), one-sided
+  if(!n)return null;var lf=lnFact(n),s=0;for(var i=k;i<=n;i++){s+=Math.exp(lf-lnFact(i)-lnFact(n-i)-n*Math.LN2)}return Math.min(1,s)}
+function tradesToConfirm(k,n){ // smallest N where Wilson 95% lower bound > 0.5 if the win rate stays at k/n
+  if(!n)return null;var p=k/n;if(p<=0.5)return Infinity;
+  for(var N=1;N<=1000000;N++){var w=wilson(p*N,N);if(w.lo>0.5)return N}return Infinity}
+
+// ---------- render ----------
+function $(id){return document.getElementById(id)}
+function render(){
+  var now=Date.now(),d=state.data;
+  var pill='NONE',src='';
+  if(d){
+    var demo=d.account.demo===true;
+    if(state.source==='file')pill=demo?'DEMO':'CACHED';
+    else if(state.source==='fetch'&&state.fresh)pill=demo?'DEMO':'LIVE';
+    else pill='CACHED';
+  }
+  var p=$('pill');p.className='pill '+pill;p.textContent=pill==='NONE'?'NO DATA':pill;
+  if(state.source==='file')src='Local file '+esc(state.fileName||'')+' · auto-refresh paused';
+  else src='Source '+esc(state.url)+(state.lastCheck?' · checked '+berlinT(state.lastCheck):'')+(state.lastGood?' · last good '+berlinT(state.lastGood):'');
+  if(d&&isNum(iso(d.updated_at)))src+=' · ledger updated '+berlin(iso(d.updated_at));
+  $('srcline').innerHTML=src;
+  var b='';
+  if(state.lastError&&state.source!=='file')b+='<div class="banner warn" data-testid="error-banner">Last check failed: '+esc(state.lastError)+'. '+(d?'Showing the last good copy.':'No ledger loaded yet.')+'</div>';
+  if(!d){$('banners').innerHTML=b;$('stale').hidden=true;['hero','integrity','edge','baselines','sessions'].forEach(function(id){$(id).innerHTML=id==='hero'?'<h2>Equity</h2><div class="mu">No valid ledger loaded. Check Settings.</div>':''});$('rulesNote').innerHTML=rulesNote(null);return}
+  if(d.account.demo===true)b+='<div class="banner demo" data-testid="demo-banner"><b>Example data.</b> This ledger is flagged as demo data (<code>account.demo: true</code>). These are not paper trades.</div>';
+  var A=analyze(d,now);
+  $('stale').hidden=!A.stale.length;
+  if(A.stale.length)b+='<div class="banner bad" data-testid="stale-banner"><b>STALE</b><br>'+A.stale.map(esc).join('<br>')+'</div>';
+  if(d.rules&&isNum(d.rules.slippage_per_share)&&cents(d.rules.slippage_per_share)!==SLIP_C)b+='<div class="banner warn">Ledger rules list slippage '+esc(d.rules.slippage_per_share)+'; the app uses the pinned $0.01 (R5/R6).</div>';
+  $('banners').innerHTML=b;
+  // hero
+  var n=A.closed.length,k=A.closed.filter(function(c){return c.actualC>0}).length;
+  var h='<h2>Realized equity</h2><div class="big" data-testid="equity">'+usd(A.eqC)+'</div>';
+  h+='<div class="'+cls(A.realC)+'" data-testid="pnl">'+usd(A.realC,true)+' ('+(A.realC>=0?'+':'−')+pct(Math.abs(A.realC)/A.startC,2)+') since start '+usd(A.startC)+'</div>';
+  h+='<div class="grid"><div class="kv"><div class="k">Win rate</div><div class="v" data-testid="winrate">'+(n?pct(k/n,0)+' <span class="small">('+k+'/'+n+')</span>':'—')+'</div></div>';
+  h+='<div class="kv"><div class="k">Closed trades</div><div class="v" data-testid="closed">'+n+'</div></div>';
+  var op=A.open[A.open.length-1];
+  if(op){var r=op.r;h+='<div class="kv" style="grid-column:1/3" data-testid="open"><div class="k">Open position · '+esc(r.date)+'</div><div class="v">'+esc(r.action)+' '+r.shares+' '+esc(r.ticker||'')+' @ '+usd(cents(r.entry_price))+'</div><div class="small">Mark '+(isNum(r.mark)?usd(cents(r.mark))+' at '+berlin(iso(r.mark_time)):'none yet')+'</div><div class="v '+cls(op.unrealC||0)+'" data-testid="unrealized">'+(op.unrealC==null?'—':usd(op.unrealC,true)+' unrealized')+'</div><div class="small">Equity incl. mark: '+(op.unrealC==null?'—':usd(A.eqC+op.unrealC))+' (sizing uses realized only)</div></div>'}
+  else h+='<div class="kv" style="grid-column:1/3" data-testid="open"><div class="k">Open position</div><div class="v mu">Flat</div></div>';
+  h+='</div>';
+  $('hero').innerHTML=h;
+  // integrity
+  var ig='<h2>Integrity checks</h2>';
+  if(!A.flags.length)ig+='<div class="ok" data-testid="all-clear">✓ Every session passes</div><div class="small">'+A.rows.length+' session'+(A.rows.length===1?'':'s')+' checked against section 6.</div>';
+  else{
+    var order={critical:0,serious:1,warning:2};var fs=A.flags.slice().sort(function(a,b){return order[a.sev]-order[b.sev]||(a.date<b.date?-1:1)});
+    var cnt={critical:0,serious:0,warning:0};fs.forEach(function(f){cnt[f.sev]++});
+    ig+='<div data-testid="flag-summary">'+cnt.critical+' critical · '+cnt.serious+' serious · '+cnt.warning+' warning</div>';
+    fs.forEach(function(f){ig+='<div class="flag '+f.sev+'" data-code="'+f.code+'"><span class="sev">'+f.sev+'</span><b>'+f.code+'</b> · '+esc(f.date)+'<br>'+esc(f.msg)+'</div>'});
+  }
+  ig+='<div class="grid"><div class="kv" style="grid-column:1/3"><div class="k">Execution gap (actual P&amp;L − rule replayed on refs, '+A.windowN+' closed-out day'+(A.windowN===1?'':'s')+')</div><div class="v '+(A.gapC?'neg':'ok')+'" data-testid="gap">'+usd(A.gapC,true)+'</div></div></div>';
+  $('integrity').innerHTML=ig;
+  // edge
+  var w=wilson(k,n),pv=binomUpper(k,n),need=tradesToConfirm(k,n);
+  var e='<h2>Is the edge real yet?</h2>';
+  if(!n)e+='<div class="mu">No closed trades yet.</div>';
+  else{
+    e+='<div class="grid"><div class="kv"><div class="k">Win rate</div><div class="v">'+pct(k/n,0)+' ('+k+'/'+n+')</div></div>';
+    e+='<div class="kv"><div class="k">95% range (Wilson)</div><div class="v" data-testid="wilson">'+pct(w.lo)+' – '+pct(w.hi)+'</div></div>';
+    e+='<div class="kv"><div class="k">Coin flip does as well</div><div class="v" data-testid="pvalue">p = '+pv.toFixed(3)+'</div></div>';
+    e+='<div class="kv"><div class="k">Trades to confirm</div><div class="v" data-testid="need">'+(need===Infinity?'not at ≤50%':need+' <span class="small">('+Math.max(0,need-n)+' more)</span>')+'</div></div></div>';
+    e+='<p class="small" data-testid="verdict">'+(w.lo>0.5?'The 95% range is above 50%. Still judge only at the review sample size Connor set in advance.':'Not yet: the 95% range still includes 50%. '+n+' trade'+(n===1?' is':'s are')+' noise.')+'</p>';
+  }
+  e+='<p class="small">How: win = closed trade with app-recomputed P&amp;L &gt; $0. Wilson score interval, z = 1.96: (p̂ + z²/2n ± z·√(p̂(1−p̂)/n + z²/4n²)) / (1 + z²/n). p-value: <b>one-sided</b> exact binomial, P(X ≥ wins | n, p = 0.5). Trades to confirm: smallest N where the Wilson 95% lower bound exceeds 50% if the win rate stays at the current p̂ (≈ z²·p̂(1−p̂)/(p̂−0.5)² for large N).</p>';
+  $('edge').innerHTML=e;
+  // baselines
+  var bl='<h2>Baselines (same window)</h2><div class="scroll"><table data-testid="baseline-table"><tr><th>Strategy</th><th>Equity</th><th>P&amp;L</th><th>Trades</th><th>Win</th></tr>';
+  A.base.forEach(function(x){bl+='<tr><td>'+esc(x.name)+'</td><td>'+usd(x.eqC)+'</td><td class="'+cls(x.pnlC)+'">'+usd(x.pnlC,true)+'</td><td>'+x.trades+'</td><td>'+(x.trades?pct(x.wins/x.trades,0):'—')+'</td></tr>'});
+  bl+='</table></div>';
+  var al=A.base[2],ru=A.base[1];
+  bl+='<p class="small">Window: '+A.windowN+' closed-out day'+(A.windowN===1?'':'s')+' with both refs. Baselines replay on open_ref/close_ref with the same rules: $0.01 slippage against you, whole shares of compounding realized equity, $0 fees. Majority = at least 2 of 3 callers agree. A caller alone trades its own UP/DOWN; NONE = no trade. '+(A.windowN?('Unanimous rule vs always long: '+usd(ru.pnlC-al.pnlC,true)+'.'):'')+'</p>';
+  bl+='<div class="scroll"><table><tr><th>Caller hit rate</th><th>Hits</th><th>Called</th><th>Flat</th><th>NONE</th></tr>';
+  A.hits.forEach(function(x){bl+='<tr><td>'+esc(x.c)+'</td><td>'+x.h+'</td><td>'+x.n+'</td><td>'+x.flat+'</td><td>'+x.none+'</td></tr>'});
+  bl+='</table></div><p class="small">Hit = UP and close_ref − open_ref &gt; '+usd(cents(A.thr))+', or DOWN and the move &lt; −'+usd(cents(A.thr))+' (rules.hit_threshold). Moves within the threshold count as flat.</p>';
+  $('baselines').innerHTML=bl;
+  // sessions
+  var ss='<h2>Sessions ('+A.rows.length+')</h2>';
+  if(!A.rows.length)ss+='<div class="mu">No sessions yet.</div>';
+  A.rows.slice().reverse().forEach(function(x){
+    var r=x.r,c=r.calls||{};
+    ss+='<div class="sess" data-testid="session" data-date="'+esc(r.date)+'"><div class="t"><span>'+esc(r.date)+' <span class="tag">'+esc(r.action||'?')+'</span><span class="tag">'+esc(r.status||'?')+'</span></span><span class="'+cls(x.actualC||x.unrealC||0)+'">'+(x.actualC!=null?usd(x.actualC,true):(x.unrealC!=null?usd(x.unrealC,true)+' open':''))+'</span></div>';
+    ss+='<div class="d">'+A.callers.map(function(k){return esc(k)+' '+esc(c[k]||'—')}).join(' · ')+'</div>';
+    ss+='<div class="d">Locked '+berlin(iso(r.calls_locked_at))+' · refs '+(isNum(r.open_ref)?usd(cents(r.open_ref)):'—')+' → '+(isNum(r.close_ref)?usd(cents(r.close_ref)):'—')+'</div>';
+    if(sideOf(r.action))ss+='<div class="d">'+(r.shares!=null?esc(r.shares)+' sh':'')+' · in '+(isNum(r.entry_price)?usd(cents(r.entry_price)):'—')+' '+berlinT(iso(r.entry_time))+(r.status==='CLOSED'?' · out '+(isNum(r.exit_price)?usd(cents(r.exit_price)):'—')+' '+berlinT(iso(r.exit_time)):'')+'</div>';
+    if(x.actualC!=null||x.ruleC!=null)ss+='<div class="d">App P&amp;L '+(x.actualC!=null?usd(x.actualC,true):'—')+' · ledger pnl '+(isNum(r.pnl)?usd(cents(r.pnl),true):'—')+' · rule '+(x.ruleC!=null?usd(x.ruleC,true):'no trade')+' · gap '+(x.gapC!=null?usd(x.gapC,true):'—')+'</div>';
+    if(x.flags.length)ss+='<div class="d">'+x.flags.map(function(f){return '<span class="tag" style="border-color:'+(f.sev==='critical'?'var(--rd)':f.sev==='serious'?'var(--am)':'var(--bl)')+'">'+f.code+'</span>'}).join(' ')+'</div>';
+    if(r.notes)ss+='<div class="d">'+esc(r.notes)+'</div>';
+    ss+='</div>';
+  });
+  $('sessions').innerHTML=ss;
+  $('rulesNote').innerHTML=rulesNote(d);
+}
+function rulesNote(d){
+  var cal=d&&d.rules?esc(d.rules.price_source||''):'';
+  return 'P&amp;L is recomputed by the app; pnl fields in the ledger are only cross-checked. Entry 09:32 ET, exit 15:52 ET (12:52 on early-close days), $0.01/share slippage against you (long pays up, short sells down), whole shares = floor(realized equity ÷ entry price), commission $0 (ledger fees ignored). Unrealized = shares × (mark − entry) for longs, (entry − mark) for shorts, with no exit slippage. All times shown in Europe/Berlin, converted from UTC. Market calendar built in through '+CAL_END+'.'+(cal?' Price source: '+cal+'.':'');
+}
+
+// ---------- loading ----------
+function bust(u){return u+(u.indexOf('?')>=0?'&':'?')+'_ts='+Date.now()}
+var inflight=false;
+function check(){
+  if(state.source==='file'||inflight)return Promise.resolve();
+  inflight=true;state.fetchCount++;
+  var url=state.url;
+  return fetch(bust(url),{cache:'no-store',credentials:'omit'}).then(function(res){
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    return res.text();
+  }).then(function(txt){
+    var obj;try{obj=JSON.parse(txt)}catch(e){throw new Error('malformed JSON')}
+    var bad=validate(obj);if(bad)throw new Error('rejected ledger: '+bad);
+    if(state.source==='file'||url!==state.url)return;
+    state.data=obj;state.source='fetch';state.fresh=true;state.lastError=null;state.lastGood=Date.now();
+    lsSet(K_CACHE,{url:url,at:state.lastGood,data:obj});
+  }).catch(function(err){
+    if(state.source==='file'||url!==state.url)return;
+    state.fresh=false;state.lastError=String(err&&err.message||err);
+  }).then(function(){inflight=false;state.lastCheck=Date.now();render()});
+}
+function loadCache(){var c=lsGet(K_CACHE);if(c&&c.url===state.url&&c.data&&!validate(c.data)){state.data=c.data;state.source='cache';state.fresh=false;state.lastGood=c.at||null}}
+function boot(){
+  var s=lsGet(K_SET);state.url=(s&&typeof s.url==='string'&&s.url)?s.url:DEFAULT_URL;
+  $('url').value=state.url;
+  loadCache();render();check();
+  setInterval(function(){check();render()},REFRESH_MS);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)check()});
+}
+$('saveLoad').addEventListener('click',function(){
+  var u=($('url').value||'').trim()||DEFAULT_URL;
+  state.url=u;lsSet(K_SET,{url:u});
+  state.source=null;state.data=null;state.fileName=null;state.lastError=null;state.fresh=false;inflight=false;
+  $('file').value='';
+  loadCache();render();check();
+});
+$('refreshNow').addEventListener('click',function(){check()});
+$('resetUrl').addEventListener('click',function(){$('url').value=DEFAULT_URL});
+$('clearStore').addEventListener('click',function(){lsDel(K_SET);lsDel(K_CACHE);$('url').value=DEFAULT_URL;state.url=DEFAULT_URL;render()});
+$('file').addEventListener('change',function(ev){
+  var f=ev.target.files&&ev.target.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    var obj;try{obj=JSON.parse(rd.result)}catch(e){alertBanner('Could not open '+f.name+': malformed JSON');return}
+    var bad=validate(obj);if(bad){alertBanner('Could not open '+f.name+': '+bad);return}
+    state.data=obj;state.source='file';state.fileName=f.name;state.fresh=true;state.lastError=null;render();
+    window.scrollTo(0,0);
+  };
+  rd.readAsText(f);
+});
+function alertBanner(msg){var d=document.createElement('div');d.className='banner bad';d.setAttribute('data-testid','file-error');d.textContent=msg;$('banners').prepend(d)}
+boot();
+})();
+</script>
+</body>
+</html>

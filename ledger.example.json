@@ -1,0 +1,108 @@
+{
+    "schema": "opschief-ledger/1",
+    "account": {
+        "name": "Operations Chief - Paper",
+        "starting_capital": 1000,
+        "start_date": "2026-11-20",
+        "currency": "USD",
+        "demo": true
+    },
+    "rules": {
+        "ticker": "PLTR",
+        "callers": [
+            "FOUNDRY",
+            "COMPASS",
+            "JACK"
+        ],
+        "consensus": "unanimous",
+        "entry_time_et": "09:32",
+        "exit_time_et": "15:52",
+        "fill_price": "close of the 1-minute bar ending at the entry/exit time",
+        "price_source": "name the 1-minute data source here",
+        "slippage_per_share": 0.01,
+        "commission_per_side": 0,
+        "sizing": "whole shares, floor(equity / entry price), long or short, no leverage",
+        "hit_threshold": 0.01
+    },
+    "updated_at": "2026-11-25T17:40:00Z",
+    "sessions": [
+        {
+            "date": "2026-11-20",
+            "ticker": "PLTR",
+            "calls": {
+                "FOUNDRY": "UP",
+                "COMPASS": "UP",
+                "JACK": "UP"
+            },
+            "calls_locked_at": "2026-11-20T14:12:00Z",
+            "open_ref": 170.0,
+            "close_ref": 172.4,
+            "action": "LONG",
+            "status": "CLOSED",
+            "shares": 5,
+            "entry_price": 170.01,
+            "entry_time": "2026-11-20T14:32:00Z",
+            "exit_price": 172.39,
+            "exit_time": "2026-11-20T20:52:00Z",
+            "fees": 0,
+            "pnl": 11.9,
+            "notes": "EXAMPLE ROW - closed long"
+        },
+        {
+            "date": "2026-11-23",
+            "ticker": "PLTR",
+            "calls": {
+                "FOUNDRY": "UP",
+                "COMPASS": "DOWN",
+                "JACK": "UP"
+            },
+            "calls_locked_at": "2026-11-23T14:09:00Z",
+            "open_ref": 171.1,
+            "close_ref": 169.85,
+            "action": "NO_TRADE",
+            "status": "NO_TRADE",
+            "notes": "EXAMPLE ROW - split call, no trade, prices still logged"
+        },
+        {
+            "date": "2026-11-24",
+            "ticker": "PLTR",
+            "calls": {
+                "FOUNDRY": "DOWN",
+                "COMPASS": "DOWN",
+                "JACK": "DOWN"
+            },
+            "calls_locked_at": "2026-11-24T14:15:00Z",
+            "open_ref": 169.5,
+            "close_ref": 167.2,
+            "action": "SHORT",
+            "status": "CLOSED",
+            "shares": 5,
+            "entry_price": 169.49,
+            "entry_time": "2026-11-24T14:32:00Z",
+            "exit_price": 167.21,
+            "exit_time": "2026-11-24T20:52:00Z",
+            "fees": 0,
+            "pnl": 11.4,
+            "notes": "EXAMPLE ROW - closed short"
+        },
+        {
+            "date": "2026-11-25",
+            "ticker": "PLTR",
+            "calls": {
+                "FOUNDRY": "UP",
+                "COMPASS": "UP",
+                "JACK": "UP"
+            },
+            "calls_locked_at": "2026-11-25T14:11:00Z",
+            "open_ref": 167.8,
+            "action": "LONG",
+            "status": "OPEN",
+            "shares": 6,
+            "entry_price": 167.81,
+            "entry_time": "2026-11-25T14:32:00Z",
+            "mark": 168.55,
+            "mark_time": "2026-11-25T17:40:00Z",
+            "notes": "EXAMPLE ROW - open position with an intraday mark"
+        }
+    ]
+}
