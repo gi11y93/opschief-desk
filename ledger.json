@@ -24,7 +24,7 @@
         "sizing": "whole shares, floor(equity / entry price), long or short, no leverage",
         "hit_threshold": 0.01
     },
-    "updated_at": "2026-11-20T20:04:53Z",
+    "updated_at": "2026-11-20T20:54:07Z",
     "sessions": [
         {
             "date": "2026-11-20",
@@ -36,15 +36,18 @@
             },
             "calls_locked_at": "2026-11-20T09:39:54Z",
             "action": "SHORT",
-            "status": "OPEN",
+            "status": "CLOSED",
             "open_ref": 149.35,
             "spy_open_ref": 713.11,
             "shares": 6,
             "entry_price": 149.34,
             "entry_time": "2026-11-20T14:32:00Z",
-            "mark": 144.85,
-            "mark_time": "2026-11-20T20:04:00Z",
-            "spy_mark": 694.08
+            "close_ref": 143.98,
+            "spy_close_ref": 690.9,
+            "exit_price": 143.99,
+            "exit_time": "2026-11-20T20:52:00Z",
+            "fees": 0,
+            "pnl": 32.1
         }
     ]
 }
