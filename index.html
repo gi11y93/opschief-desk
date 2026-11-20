@@ -5,43 +5,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self' https:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="opschief-build" content="2026-11-20.1">
+<meta name="opschief-build" content="2026-11-20.2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Paper Desk">
-<meta name="theme-color" content="#0f1720">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161d27" media="(prefers-color-scheme: dark)">
 <title>Ops Chief Paper Desk</title>
 <style>
-:root{--bg:#0f1720;--card:#17212d;--line:#263445;--tx:#e6edf3;--mu:#8fa1b3;--gr:#2ecc71;--rd:#ff5d5d;--am:#f5b942;--bl:#4aa3ff;--pu:#b48cff}
+:root{--bg:#eef1f5;--card:#fff;--tile:#f4f6f9;--line:#e3e7ee;--tx:#111827;--tx2:#374151;--mu:#6b7280;--gr:#16a34a;--rd:#dc2626;--am:#b7791f;--bl:#2f7fd8;--blf:rgba(47,127,216,.12);--pu:#7c3aed;--spy:#8a93a3;--hdr:#fff;--banD:#f3efff;--banDb:#a78bfa;--banW:#fff8e6;--banWb:#e0a526;--banB:#fdecec;--banBb:#e57373;--field:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#0d121a;--card:#161d27;--tile:#1f2833;--line:#2a3441;--tx:#e8edf3;--tx2:#c9d2dc;--mu:#8f9bab;--gr:#34c76f;--rd:#ff6b6b;--am:#f5b942;--bl:#4a9ef0;--blf:rgba(74,158,240,.18);--pu:#b18cff;--spy:#9aa5b5;--hdr:#161d27;--banD:#231c3a;--banDb:#7c5cd6;--banW:#2a2414;--banWb:#a9801f;--banB:#2c1717;--banBb:#b34a4a;--field:#0f151d}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-header{position:sticky;top:0;z-index:5;background:rgba(15,23,32,.96);border-bottom:1px solid var(--line);padding:10px 14px}
-.hrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-h1{font-size:17px;margin:0;flex:1 1 auto}
-.pill{font-size:12px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:999px;border:1px solid}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+header{position:sticky;top:0;z-index:5;background:var(--hdr);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px}
+.hrow{display:flex;align-items:center;gap:8px}
+h1{font-size:17px;font-weight:700;margin:0;flex:1 1 auto;letter-spacing:-.01em}
+.pill{font-size:11px;font-weight:700;letter-spacing:.08em;padding:3px 10px;border-radius:999px;border:1.5px solid;line-height:1.3}
 .pill.LIVE{color:var(--gr);border-color:var(--gr)}
 .pill.DEMO{color:var(--pu);border-color:var(--pu)}
 .pill.CACHED{color:var(--am);border-color:var(--am)}
 .pill.STALE{color:#fff;background:var(--rd);border-color:var(--rd)}
 .pill.NONE{color:var(--mu);border-color:var(--mu)}
-.sub{color:var(--mu);font-size:12px;margin-top:4px}
-main{padding:12px;max-width:720px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
-.card h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:0 0 10px}
-.banner{border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px}
-.banner.demo{background:rgba(180,140,255,.14);border:1px solid var(--pu)}
-.banner.warn{background:rgba(245,185,66,.12);border:1px solid var(--am)}
-.banner.bad{background:rgba(255,93,93,.12);border:1px solid var(--rd)}
-.big{font-size:34px;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--mu);font-size:12px;margin-top:3px}
+main{padding:12px;max-width:560px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.card h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:0 0 10px;font-weight:600}
+.banner{border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:13.5px;line-height:1.45}
+.banner.demo{background:var(--banD);border:1px solid var(--banDb)}
+.banner.warn{background:var(--banW);border:1px solid var(--banWb)}
+.banner.bad{background:var(--banB);border:1px solid var(--banBb)}
+.banner button{margin:6px 0 0}
+.lbl{color:var(--mu);font-size:15px;display:flex;align-items:center;gap:8px}
+.eye{background:none;border:0;padding:4px;margin:0;min-height:0;color:var(--mu);line-height:0;cursor:pointer}
+.total{font-size:38px;font-weight:700;letter-spacing:-.02em;margin:6px 0 10px;font-variant-numeric:tabular-nums}
+.chg{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
 .pos{color:var(--gr)}.neg{color:var(--rd)}.mu{color:var(--mu)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.kv{background:rgba(255,255,255,.03);border-radius:10px;padding:8px 10px}
-.kv .k{font-size:12px;color:var(--mu)}.kv .v{font-size:18px;font-weight:600}
+.chart{position:relative;margin:16px 0 4px}
+.chart svg{display:block;width:100%;height:170px;touch-action:pan-y;overflow:visible}
+.chart .base{position:absolute;right:0;font-size:11px;color:var(--mu);transform:translateY(-120%);background:var(--card);padding:0 2px}
+.xl{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:4px}
+.ph{border:1.5px dashed var(--line);border-radius:12px;height:210px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--mu);font-size:14px;padding:16px;margin:18px 0 6px;line-height:1.5}
+.ranges{display:flex;gap:8px;margin:10px 0 2px}
+.ranges button{margin:0;min-height:32px;padding:5px 13px;border-radius:999px;font-size:12px;font-weight:600;background:var(--tile);border:0;color:var(--tx2)}
+.ranges button.on{background:var(--bl);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.kv{background:var(--tile);border-radius:12px;padding:10px 12px;min-width:0}
+.kv.wide{grid-column:1/3}
+.kv .k{font-size:12px;color:var(--mu);display:flex;align-items:center;gap:6px}
+.kv .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.kv .s{font-size:12px;color:var(--mu);margin-top:2px}
+.kv .v small{font-size:12px;color:var(--mu);font-weight:600}
+.kv .v.flat{color:var(--tx2);font-weight:600}
+.lg{display:inline-block;width:12px;height:3px;border-radius:2px;background:var(--bl)}
+.lg.spy{background:repeating-linear-gradient(90deg,var(--spy) 0 4px,transparent 4px 7px)}
+.vs{font-size:13px;font-weight:600;margin-top:12px}
+.how{margin-top:14px}
+.how summary{font-size:12.5px;font-weight:600;color:var(--tx2);min-height:28px;list-style:none;cursor:pointer}
+.how summary::-webkit-details-marker{display:none}
+.how summary::before{content:"▸ ";color:var(--mu)}
+.how[open] summary::before{content:"▾ "}
+.how .small p{margin:6px 0}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{text-align:right;padding:6px 4px;border-bottom:1px solid var(--line);white-space:nowrap}
 th:first-child,td:first-child{text-align:left;white-space:normal}
 th{color:var(--mu);font-weight:600}
-.flag{border-left:3px solid;padding:6px 8px;margin:6px 0;border-radius:6px;background:rgba(255,255,255,.03);font-size:13px}
+.flag{border-left:3px solid;padding:6px 8px;margin:6px 0;border-radius:6px;background:var(--tile);font-size:13px}
 .flag.critical{border-color:var(--rd)}.flag.serious{border-color:var(--am)}.flag.warning{border-color:var(--bl)}
 .sev{font-size:11px;font-weight:700;text-transform:uppercase;margin-right:6px}
 .critical .sev{color:var(--rd)}.serious .sev{color:var(--am)}.warning .sev{color:var(--bl)}
@@ -52,11 +80,11 @@ th{color:var(--mu);font-weight:600}
 .sess .d{color:var(--mu);font-size:13px;margin-top:3px}
 .tag{font-size:11px;padding:1px 6px;border-radius:6px;border:1px solid var(--line);margin-left:4px}
 label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
-input[type=url],input[type=text]{width:100%;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0b121a;color:var(--tx)}
+input[type=url],input[type=text]{width:100%;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--field);color:var(--tx)}
 input[type=file]{font-size:14px;color:var(--tx);max-width:100%}
-button{font-size:15px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#22303f;color:var(--tx);margin:8px 8px 0 0;min-height:44px}
-button.primary{background:var(--bl);border-color:var(--bl);color:#04121f;font-weight:700}
-details summary{cursor:pointer;font-weight:600;min-height:32px}
+button{font-size:15px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--tile);color:var(--tx);margin:8px 8px 0 0;min-height:44px}
+button.primary{background:var(--bl);border-color:var(--bl);color:#fff;font-weight:700}
+#settings details>summary{cursor:pointer;font-weight:600;min-height:32px}
 .small{font-size:12px;color:var(--mu)}
 code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -93,12 +121,8 @@ code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
       <button id="resetUrl" type="button">Reset URL to ./ledger.json</button>
       <button id="clearStore" type="button">Clear stored data</button>
       <p class="small" data-testid="build">Build <b id="buildId"></b> · page loaded <span id="loadedAt"></span> · <span id="pageMode"></span></p>
-      <p class="small" id="storageNote">Stored on this phone (localStorage): the ledger URL and the last good copy of the ledger, so the app can show it as CACHED if a check fails. Opened files are not stored. The app is read-only: it only reads the ledger, never writes it, holds no credentials, and sends nothing anywhere.</p>
+      <p class="small" id="storageNote">Stored on this phone (localStorage): the ledger URL, the hide-amounts (eye) choice and the last good copy of the ledger, so the app can show it as CACHED if a check fails. Opened files are not stored. The app is read-only: it only reads the ledger, never writes it, holds no credentials, and sends nothing anywhere.</p>
     </details>
-  </section>
-  <section class="card" id="about">
-    <h2>Rules used for the arithmetic</h2>
-    <div class="small" id="rulesNote"></div>
   </section>
 </main>
 <script>
@@ -107,9 +131,9 @@ code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
 var SCHEMA='opschief-ledger/1';
 var NY='America/New_York', BER='Europe/Berlin';
 var REFRESH_MS=60000;
-var K_SET='opschiefDesk.settings.v1', K_CACHE='opschiefDesk.lastGood.v1';
+var K_SET='opschiefDesk.settings.v1', K_CACHE='opschiefDesk.lastGood.v1', K_PREF='opschiefDesk.prefs.v1';
 var DEFAULT_URL='./ledger.json';
-var BUILD='2026-11-20.1';
+var BUILD='2026-11-20.2';
 // Published home of the app. Used only when this page was opened outside a web address (file, preview, about:blank).
 var HOME_APP='https://gi11y93.github.io/opschief-desk/';
 var UPDATE_MS=600000;
@@ -305,33 +329,28 @@ function render(){
     else pill='CACHED';
   }
   var p=$('pill');p.className='pill '+pill;p.textContent=pill==='NONE'?'NO DATA':pill;
-  if(state.source==='file')src='Local file '+esc(state.fileName||'')+' · auto-refresh paused';
-  else src='Source '+esc(state.url)+(state.lastCheck?' · checked '+berlinT(state.lastCheck):'')+(state.lastGood?' · last good '+berlinT(state.lastGood):'');
-  if(d&&isNum(iso(d.updated_at)))src+=' · ledger updated '+berlin(iso(d.updated_at));
+  var upd=d&&isNum(iso(d.updated_at))?'Updated '+berlinShort(iso(d.updated_at)):(d?'Updated —':'Not loaded yet');
+  if(state.source==='file')src=upd+' · local file '+esc(state.fileName||'')+' · auto-refresh paused';
+  else src=upd+(state.lastCheck?' · checked '+hhmm(state.lastCheck,BER)+(state.lastError?' (failed)':''):'');
   $('srcline').innerHTML=src;
+  $('srcline').title='Source '+state.url+(state.lastGood?' · last good '+berlin(state.lastGood):'')+' · times in Berlin';
   var b='';
   if(state.newBuild)b+='<div class="banner warn" data-testid="update-banner">A newer version of this app is published (build '+esc(state.newBuild)+'; this is '+esc(BUILD)+'). <button type="button" id="reloadFresh">Reload now</button></div>';
   if(state.offsite)b+='<div class="banner warn" data-testid="offsite-banner">This copy was opened outside the app’s web address (as a file or preview), so it reads the ledger from '+esc(HOME_APP)+'ledger.json. For the real app, open <b>'+esc(HOME_APP)+'</b> in Safari and use Share → Add to Home Screen.</div>';
   if(state.urlNotice)b+='<div class="banner warn" data-testid="url-banner">'+esc(state.urlNotice)+'</div>';
   if(state.lastError&&state.source!=='file')b+='<div class="banner warn" data-testid="error-banner">Last check failed: '+esc(state.lastError)+'. '+(d?'Showing the last good copy.':'No ledger loaded yet.')+'</div>';
-  if(!d){$('banners').innerHTML=b;$('stale').hidden=true;['hero','integrity','edge','baselines','sessions'].forEach(function(id){$(id).innerHTML=id==='hero'?'<h2>Equity</h2><div class="mu">No valid ledger loaded. Check Settings.</div>':''});$('rulesNote').innerHTML=rulesNote(null);return}
+  ['integrity','edge','baselines','sessions'].forEach(function(id){$(id).hidden=!d});
+  if(!d){$('banners').innerHTML=b;$('stale').hidden=true;['integrity','edge','baselines','sessions'].forEach(function(id){$(id).innerHTML=''});$('hero').innerHTML='<div class="lbl">Total value</div><div class="mu" style="margin-top:6px">No valid ledger loaded. Check Settings.</div>';return}
   if(d.account.demo===true)b+='<div class="banner demo" data-testid="demo-banner"><b>Example data.</b> This ledger is flagged as demo data (<code>account.demo: true</code>). These are not paper trades.</div>';
   var A=analyze(d,now);
   $('stale').hidden=!A.stale.length;
   if(A.stale.length)b+='<div class="banner bad" data-testid="stale-banner"><b>STALE</b><br>'+A.stale.map(esc).join('<br>')+'</div>';
   if(d.rules&&isNum(d.rules.slippage_per_share)&&cents(d.rules.slippage_per_share)!==SLIP_C)b+='<div class="banner warn">Ledger rules list slippage '+esc(d.rules.slippage_per_share)+'; the app uses the pinned $0.01 (R5/R6).</div>';
   $('banners').innerHTML=b;
-  // hero
+  // hero (layout follows Connor's mockup, panel "Your live ledger tonight")
   var n=A.closed.length,k=A.closed.filter(function(c){return c.actualC>0}).length;
-  var h='<h2>Realized equity</h2><div class="big" data-testid="equity">'+usd(A.eqC)+'</div>';
-  h+='<div class="'+cls(A.realC)+'" data-testid="pnl">'+usd(A.realC,true)+' ('+(A.realC>=0?'+':'−')+pct(Math.abs(A.realC)/A.startC,2)+') since start '+usd(A.startC)+'</div>';
-  h+='<div class="grid"><div class="kv"><div class="k">Win rate</div><div class="v" data-testid="winrate">'+(n?pct(k/n,0)+' <span class="small">('+k+'/'+n+')</span>':'—')+'</div></div>';
-  h+='<div class="kv"><div class="k">Closed trades</div><div class="v" data-testid="closed">'+n+'</div></div>';
-  var op=A.open[A.open.length-1];
-  if(op){var r=op.r;h+='<div class="kv" style="grid-column:1/3" data-testid="open"><div class="k">Open position · '+esc(r.date)+'</div><div class="v">'+esc(r.action)+' '+r.shares+' '+esc(r.ticker||'')+' @ '+usd(cents(r.entry_price))+'</div><div class="small">Mark '+(isNum(r.mark)?usd(cents(r.mark))+' at '+berlin(iso(r.mark_time)):'none yet')+'</div><div class="v '+cls(op.unrealC||0)+'" data-testid="unrealized">'+(op.unrealC==null?'—':usd(op.unrealC,true)+' unrealized')+'</div><div class="small">Equity incl. mark: '+(op.unrealC==null?'—':usd(A.eqC+op.unrealC))+' (sizing uses realized only)</div></div>'}
-  else h+='<div class="kv" style="grid-column:1/3" data-testid="open"><div class="k">Open position</div><div class="v mu">Flat</div></div>';
-  h+='</div>';
-  $('hero').innerHTML=h;
+  $('hero').innerHTML=heroHtml(d,A,now,n,k);
+  bindHero();
   // integrity
   var ig='<h2>Integrity checks</h2>';
   if(!A.flags.length)ig+='<div class="ok" data-testid="all-clear">✓ Every session passes</div><div class="small">'+A.rows.length+' session'+(A.rows.length===1?'':'s')+' checked against section 6.</div>';
@@ -381,7 +400,116 @@ function render(){
     ss+='</div>';
   });
   $('sessions').innerHTML=ss;
-  $('rulesNote').innerHTML=rulesNote(d);
+}
+function berlinShort(ms){var t=berlin(ms);return t.replace(/ Berlin$/,'')}
+function mm(c,signed){return state.masked?'•••••':usd(c,signed)}
+function pctS(x){var v=(x*100);var r=Math.round(v*100)/100;return (r>0?'+':(r<0?'−':'+'))+Math.abs(r).toFixed(2)+'%'}
+function chgTxt(c,base){return mm(c,true)+' ('+pctS(base?c/base:0)+')'}
+function firstCloseMs(d,A,now){
+  if(A.rows.length){var r=A.rows[0].r;if(isDateStr(r.date))return nyToUtc(r.date,exitEt(r))}
+  var start=isDateStr(d.account.start_date)?d.account.start_date:A.today,day=start>A.today?start:A.today;
+  for(var i=0;i<14;i++){var a=day.split('-').map(Number),dt=new Date(Date.UTC(a[0],a[1]-1,a[2]+i)),ds=dt.toISOString().slice(0,10);
+    if(!isTradingDay(ds))continue;var ex=nyToUtc(ds,exitEt({date:ds}));if(ex>now||i===13)return ex}
+  return null;
+}
+function buildSeries(d,A){
+  var pts=[{date:isDateStr(d.account.start_date)?d.account.start_date:(A.rows[0]&&A.rows[0].r.date)||A.today,v:A.startC,label:'Start',start:true}];
+  var first=A.rows[0]&&A.rows[0].r,spyOpen=first&&isNum(first.spy_open_ref)&&first.spy_open_ref>0?first.spy_open_ref:null;
+  pts[0].spy=spyOpen?A.startC:null;
+  A.rows.forEach(function(x){var r=x.r,closedOut=(r.status==='CLOSED'||r.status==='NO_TRADE')&&isNum(r.close_ref);
+    if(closedOut)pts.push({date:r.date,v:x.eqAfter,spy:spyOpen&&isNum(r.spy_close_ref)?A.startC*r.spy_close_ref/spyOpen:null,label:r.date,close:nyToUtc(r.date,exitEt(r))});
+    else if(r.status==='OPEN'&&x.unrealC!=null)pts.push({date:r.date,v:x.eqBefore+x.unrealC,spy:spyOpen&&isNum(r.spy_mark)?A.startC*r.spy_mark/spyOpen:null,label:'Now',live:true,close:iso(r.mark_time)});
+  });
+  return {pts:pts,hasSpy:!!spyOpen};
+}
+var RANGES={'1W':7,'1M':31,'3M':92,'All':0};
+function inRange(pts){
+  var days=RANGES[state.range||'All'];if(!days||pts.length<3)return pts;
+  var last=pts[pts.length-1].date,a=last.split('-').map(Number),cut=new Date(Date.UTC(a[0],a[1]-1,a[2]-days)).toISOString().slice(0,10);
+  var out=pts.filter(function(p){return p.date>=cut});
+  if(out.length<2)out=pts.slice(-2);
+  return out;
+}
+function dShort(ds){var a=ds.split('-').map(Number);return a[2]+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][a[1]-1]}
+function dDay(ds){var a=ds.split('-').map(Number);return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(Date.UTC(a[0],a[1]-1,a[2])).getUTCDay()]+' '+dShort(ds)}
+var EYE='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+var EYE_OFF='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+var heroCtx=null;
+function heroHtml(d,A,now,n,k){
+  var unreal=0;A.open.forEach(function(o){if(o.unrealC!=null)unreal+=o.unrealC});
+  var totalC=A.eqC+unreal,last=A.rows[A.rows.length-1];
+  var refC=(last&&(last.r.status==='OPEN'||String(last.r.date)>=A.today))?last.eqBefore:totalC;
+  var S=buildSeries(d,A),R=inRange(S.pts),showChart=S.pts.length>=2;
+  var r0=R[0],rN=R[R.length-1];
+  heroCtx={pts:R,totalC:totalC,refC:refC};
+  var h='<div class="lbl">Total value <button class="eye" id="eye" type="button" aria-label="'+(state.masked?'Show':'Hide')+' amounts" data-testid="eye">'+(state.masked?EYE_OFF:EYE)+'</button></div>';
+  h+='<div class="total" id="totalV" data-testid="total">'+mm(totalC)+'</div>';
+  h+='<div class="lbl" id="chgL" style="font-size:14px">Day change</div><div class="chg '+cls(totalC-refC)+'" id="chgV" data-testid="daychange">'+chgTxt(totalC-refC,refC)+'</div>';
+  if(!showChart){
+    var fc=firstCloseMs(d,A,now);
+    h+='<div class="ph" data-testid="chart-placeholder">Chart starts when the first session closes: '+(fc?berlin(fc):'—')+'.</div>';
+  }else{
+    h+=chartSvg(R,S.hasSpy,A.startC);
+    h+='<div class="ranges" data-testid="ranges">'+Object.keys(RANGES).map(function(key){return '<button type="button" data-range="'+key+'" class="'+((state.range||'All')===key?'on':'')+'">'+key+'</button>'}).join('')+'</div>';
+  }
+  var deskP=r0.v?rN.v/r0.v-1:0,spyOk=S.hasSpy&&r0.spy!=null&&rN.spy!=null&&showChart,spyP=spyOk?rN.spy/r0.spy-1:null;
+  h+='<div class="grid">';
+  h+='<div class="kv"><div class="k"><span class="lg"></span>Paper desk</div><div class="v '+(showChart?cls(rN.v-r0.v):'')+'" data-testid="desk-pct">'+pctS(deskP)+'</div><div class="s">'+mm(rN.v)+'</div></div>';
+  h+='<div class="kv"><div class="k"><span class="lg spy"></span>S&amp;P 500 (SPY)</div>'+(spyOk?'<div class="v '+cls(rN.spy-r0.spy)+'" data-testid="spy-pct">'+pctS(spyP)+'</div><div class="s">'+mm(Math.round(rN.spy))+'</div>':'<div class="v" data-testid="spy-pct">—</div><div class="s">'+(A.rows.length?'No SPY prices in the ledger yet':'Starts with the first session')+'</div>')+'</div>';
+  if(spyOk){var diff=(deskP-spyP)*100;h+='<div class="vs wide '+(diff>=0?'pos':'neg')+'" style="grid-column:1/3;margin-top:0" data-testid="vs-spy">'+(diff>=0?'Ahead of':'Behind')+' the S&amp;P 500 by '+Math.abs(diff).toFixed(2)+' pts</div>'}
+  h+='<div class="kv"><div class="k">Realized equity</div><div class="v" data-testid="equity">'+mm(A.eqC)+'</div></div>';
+  h+='<div class="kv"><div class="k">Win rate</div><div class="v"><span data-testid="winrate">'+(n?pct(k/n,0):'—')+'</span> <small>of <span data-testid="closed">'+n+'</span></small></div></div>';
+  var op=A.open[A.open.length-1];
+  if(op){var r=op.r;h+='<div class="kv wide" data-testid="open"><div class="k">Open position · '+esc(r.date)+'</div><div class="v">'+esc(r.action)+' '+esc(r.shares)+' '+esc(r.ticker||'')+' @ '+usd(cents(r.entry_price))+'</div><div class="s">Mark '+(isNum(r.mark)?usd(cents(r.mark))+' at '+berlin(iso(r.mark_time)):'none yet')+'</div><div class="v '+cls(op.unrealC||0)+'" style="font-size:16px;margin-top:4px" data-testid="unrealized">'+(op.unrealC==null?'—':mm(op.unrealC,true)+' unrealized')+'</div></div>'}
+  else h+='<div class="kv wide" data-testid="open"><div class="k">Open position</div><div class="v flat">Flat</div></div>';
+  h+='</div>';
+  h+='<details class="how" id="how"'+(state.howOpen?' open':'')+'><summary>How these numbers work</summary><div class="small">';
+  h+='<p data-testid="pnl" class="'+cls(A.realC)+'">'+usd(A.realC,true)+' ('+(A.realC>=0?'+':'−')+pct(Math.abs(A.realC)/A.startC,2)+') realized since start '+usd(A.startC)+'.</p>';
+  h+='<p><b>Total value</b> = realized equity + unrealized P&amp;L of the open position at its latest mark. <b>Day change</b> = total value minus realized equity at the previous session close. <b>Paper desk</b> and <b>S&amp;P 500</b> tiles show the change over the selected range'+(showChart?'':' (from the start)')+'. Press and drag the chart to read any close.</p>';
+  h+='<p><b>S&amp;P 500 (SPY)</b>: buy-and-hold of the starting capital from the first session’s <code>spy_open_ref</code>, valued at each <code>spy_close_ref</code> (<code>spy_mark</code> while a session is live); price return, fractional shares, no fees or dividends. These SPY fields are optional in the ledger; without them the tile shows —.</p>';
+  h+='<p>'+rulesNote(d)+'</p></div></details>';
+  return h;
+}
+function chartSvg(R,hasSpy,startC){
+  var W=320,H=170,pad=8,vals=[startC];R.forEach(function(p){vals.push(p.v);if(p.spy!=null)vals.push(p.spy)});
+  var lo=Math.min.apply(null,vals),hi=Math.max.apply(null,vals);if(hi-lo<100){var m=(hi+lo)/2;lo=m-50;hi=m+50}var sp=(hi-lo)*0.12;lo-=sp;hi+=sp;
+  var X=function(i){return R.length<2?W/2:i*(W)/(R.length-1)},Y=function(v){return pad+(H-2*pad)*(1-(v-lo)/(hi-lo))};
+  var line=R.map(function(p,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.v).toFixed(1)}).join(' ');
+  var area=line+' L'+X(R.length-1).toFixed(1)+' '+H+' L0 '+H+' Z';
+  var spy='';if(hasSpy){var seg=R.map(function(p,i){return p.spy==null?null:[X(i),Y(p.spy)]}).filter(Boolean);if(seg.length>1)spy='<path d="'+seg.map(function(q,i){return (i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)}).join(' ')+'" fill="none" stroke="var(--spy)" stroke-width="1.6" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>'}
+  var by=Y(startC),last=R[R.length-1];
+  var svg='<div class="chart" id="chart" data-testid="chart"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Total value by session close">';
+  svg+='<line x1="0" x2="'+W+'" y1="'+by.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="var(--mu)" stroke-width="1" stroke-dasharray="2 3" vector-effect="non-scaling-stroke" opacity=".7"/>';
+  svg+='<path d="'+area+'" fill="var(--blf)" stroke="none"/>'+spy;
+  svg+='<path d="'+line+'" fill="none" stroke="var(--bl)" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+  svg+='<g id="cur" style="display:none"><line id="curL" y1="0" y2="'+H+'" stroke="var(--mu)" stroke-width="1" vector-effect="non-scaling-stroke"/></g>';
+  svg+='</svg><div class="base" style="top:'+(by/H*100).toFixed(1)+'%">Start '+mm(startC)+'</div>';
+  svg+='<div id="dotEnd" style="position:absolute;left:calc(100% - 4px);top:calc('+(Y(last.v)/H*100).toFixed(1)+'% - 4px);width:8px;height:8px;border-radius:50%;background:var(--bl)"></div>';
+  svg+='<div id="dotCur" style="display:none;position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid var(--bl);background:var(--card)"></div>';
+  var lab=[R[0].start?'Start':dShort(R[0].date)];if(R.length>3)lab.push(dShort(R[Math.round((R.length-1)/3)].date),dShort(R[Math.round(2*(R.length-1)/3)].date));else if(R.length===3)lab.push(dShort(R[1].date));
+  lab.push(last.live?'Now':(R.length>1?dShort(last.date):''));
+  svg+='<div class="xl">'+lab.map(function(t){return '<span>'+esc(t)+'</span>'}).join('')+'</div></div>';
+  heroCtx&&(heroCtx.Y=Y,heroCtx.H=H);
+  return svg;
+}
+function bindHero(){
+  var eye=$('eye');if(eye)eye.onclick=function(){state.masked=!state.masked;lsSet(K_PREF,{masked:state.masked});render()};
+  var how=$('how');if(how)how.addEventListener('toggle',function(){state.howOpen=how.open});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-range]'),function(bt){bt.onclick=function(){state.range=bt.getAttribute('data-range');render()}});
+  var ch=$('chart');if(!ch||!heroCtx)return;
+  var R=heroCtx.pts,svg=ch.querySelector('svg');
+  function at(ev){var rc=svg.getBoundingClientRect();var f=Math.min(1,Math.max(0,(ev.clientX-rc.left)/rc.width));return Math.round(f*(R.length-1))}
+  function show(i){var p=R[i],p0=R[0],x=R.length<2?50:i/(R.length-1)*100;
+    $('cur').style.display='';$('curL').setAttribute('x1',x/100*320);$('curL').setAttribute('x2',x/100*320);
+    var dc=$('dotCur');dc.style.display='';dc.style.left='calc('+x+'% - 5px)';dc.style.top='calc('+(heroCtx.Y(p.v)/heroCtx.H*100)+'% - 5px)';
+    $('totalV').textContent=mm(p.v);
+    $('chgL').textContent=(p.start?'Start':(p.live?'Now':dDay(p.date)+' close'))+' · vs '+(p0.start?'start':dShort(p0.date));
+    var c=p.v-p0.v,cv=$('chgV');cv.textContent=chgTxt(c,p0.v);cv.className='chg '+cls(c)}
+  function hide(){$('cur').style.display='none';$('dotCur').style.display='none';$('totalV').textContent=mm(heroCtx.totalC);$('chgL').textContent='Day change';var c=heroCtx.totalC-heroCtx.refC,cv=$('chgV');cv.textContent=chgTxt(c,heroCtx.refC);cv.className='chg '+cls(c)}
+  var down=false;
+  svg.addEventListener('pointerdown',function(e){down=true;show(at(e))});
+  svg.addEventListener('pointermove',function(e){if(down||e.pointerType==='mouse')show(at(e))});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){svg.addEventListener(t,function(){down=false;hide()})});
 }
 function rulesNote(d){
   var cal=d&&d.rules?esc(d.rules.price_source||''):'';
@@ -450,6 +578,7 @@ function checkUpdate(){
 function reloadFresh(){try{var u=new URL(location.pathname,location.href);u.searchParams.set('v',state.newBuild||String(Date.now()));location.replace(u.href)}catch(e){location.reload()}}
 function boot(){
   state.offsite=!pageIsWeb();
+  var pf=lsGet(K_PREF);state.masked=!!(pf&&pf.masked===true);state.range='All';
   applyStoredUrl();
   $('url').value=state.url;
   $('buildId').textContent=BUILD;$('loadedAt').textContent=berlin(Date.now());
