@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self' https:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
+<meta name="opschief-build" content="2026-11-20.1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Paper Desk">
 <meta name="theme-color" content="#0f1720">
@@ -81,7 +82,8 @@ code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
     <details id="settingsDetails">
       <summary>Settings</summary>
       <label for="url">Ledger URL</label>
-      <input id="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="./ledger.json">
+      <input id="url" name="ledger-source" type="text" inputmode="url" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="./ledger.json">
+      <div class="small neg" id="urlError" data-testid="url-error" hidden></div>
       <div class="small">Default <code>./ledger.json</code> (same folder as this page). A ledger on another host must send <code>Access-Control-Allow-Origin</code>.</div>
       <button class="primary" id="saveLoad" type="button">Save &amp; load live ledger</button>
       <button id="refreshNow" type="button">Refresh now</button>
@@ -90,6 +92,7 @@ code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
       <div class="small">Opening a file shows it on this phone only and pauses auto-refresh until you tap “Save &amp; load live ledger”.</div>
       <button id="resetUrl" type="button">Reset URL to ./ledger.json</button>
       <button id="clearStore" type="button">Clear stored data</button>
+      <p class="small" data-testid="build">Build <b id="buildId"></b> · page loaded <span id="loadedAt"></span> · <span id="pageMode"></span></p>
       <p class="small" id="storageNote">Stored on this phone (localStorage): the ledger URL and the last good copy of the ledger, so the app can show it as CACHED if a check fails. Opened files are not stored. The app is read-only: it only reads the ledger, never writes it, holds no credentials, and sends nothing anywhere.</p>
     </details>
   </section>
@@ -106,6 +109,10 @@ var NY='America/New_York', BER='Europe/Berlin';
 var REFRESH_MS=60000;
 var K_SET='opschiefDesk.settings.v1', K_CACHE='opschiefDesk.lastGood.v1';
 var DEFAULT_URL='./ledger.json';
+var BUILD='2026-11-20.1';
+// Published home of the app. Used only when this page was opened outside a web address (file, preview, about:blank).
+var HOME_APP='https://gi11y93.github.io/opschief-desk/';
+var UPDATE_MS=600000;
 var DEFAULT_CALLERS=['FOUNDRY','COMPASS','JACK'];
 // Pinned rules (R5-R8). Only Connor changes them.
 var SLIP_C=1;            // $0.01 per share, against you
@@ -116,11 +123,11 @@ var CLOSED={'2026-11-26':1,'2026-12-25':1,'2027-01-01':1};
 var EARLY={'2026-11-27':1,'2026-12-24':1};
 var CAL_END='2027-01-01';
 
-var state={data:null,source:null,fresh:false,lastError:null,lastCheck:null,lastGood:null,url:DEFAULT_URL,fileName:null,fetchCount:0};
+var state={data:null,source:null,fresh:false,lastError:null,lastCheck:null,lastGood:null,url:DEFAULT_URL,href:null,urlNotice:null,offsite:false,newBuild:null,fileName:null,fetchCount:0,build:BUILD};
 window.__opschief=state;
 
 // ---------- storage ----------
-function lsGet(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+function lsGet(k){var v;try{v=localStorage.getItem(k)}catch(e){return null}if(v==null)return null;try{return JSON.parse(v)}catch(e){return {__corrupt:String(v)}}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
 
@@ -303,6 +310,9 @@ function render(){
   if(d&&isNum(iso(d.updated_at)))src+=' · ledger updated '+berlin(iso(d.updated_at));
   $('srcline').innerHTML=src;
   var b='';
+  if(state.newBuild)b+='<div class="banner warn" data-testid="update-banner">A newer version of this app is published (build '+esc(state.newBuild)+'; this is '+esc(BUILD)+'). <button type="button" id="reloadFresh">Reload now</button></div>';
+  if(state.offsite)b+='<div class="banner warn" data-testid="offsite-banner">This copy was opened outside the app’s web address (as a file or preview), so it reads the ledger from '+esc(HOME_APP)+'ledger.json. For the real app, open <b>'+esc(HOME_APP)+'</b> in Safari and use Share → Add to Home Screen.</div>';
+  if(state.urlNotice)b+='<div class="banner warn" data-testid="url-banner">'+esc(state.urlNotice)+'</div>';
   if(state.lastError&&state.source!=='file')b+='<div class="banner warn" data-testid="error-banner">Last check failed: '+esc(state.lastError)+'. '+(d?'Showing the last good copy.':'No ledger loaded yet.')+'</div>';
   if(!d){$('banners').innerHTML=b;$('stale').hidden=true;['hero','integrity','edge','baselines','sessions'].forEach(function(id){$(id).innerHTML=id==='hero'?'<h2>Equity</h2><div class="mu">No valid ledger loaded. Check Settings.</div>':''});$('rulesNote').innerHTML=rulesNote(null);return}
   if(d.account.demo===true)b+='<div class="banner demo" data-testid="demo-banner"><b>Example data.</b> This ledger is flagged as demo data (<code>account.demo: true</code>). These are not paper trades.</div>';
@@ -379,14 +389,34 @@ function rulesNote(d){
 }
 
 // ---------- loading ----------
-function absUrl(u){try{var x=new URL(u,location.href);if(x.username||x.password||!/^https?:$/.test(x.protocol))throw 0;return x.href}catch(e){return new URL(DEFAULT_URL,location.href).href}}
-function bust(u){u=absUrl(u);return u+(u.indexOf('?')>=0?'&':'?')+'_ts='+Date.now()}
+// URL handling. Every fetch URL is built here from a validated, absolute http(s) URL, so fetch() can't throw on it.
+function pageIsWeb(){try{return /^https?:$/.test(location.protocol)}catch(e){return false}}
+function baseHref(){return pageIsWeb()?location.href:HOME_APP}
+function maskUrl(raw){var t=String(raw==null?'':raw).replace(/[\u0000-\u001f\u007f]/g,'?');t=t.replace(/^([a-z][a-z0-9+.\-]*:\/\/)?[^\/?#@\s]*@/i,function(m,sch){return (sch||'')+'***@'});return t.length>80?t.slice(0,77)+'…':t}
+function normUrl(raw){
+  if(typeof raw!=='string')return {ok:false,empty:raw==null,reason:'not text'};
+  var t=raw.replace(/[\u0000-\u001f\u007f\u00a0\u200b-\u200d\u2028\u2029\ufeff]/g,' ').trim();
+  if(!t)return {ok:false,empty:true,reason:'empty'};
+  var u;try{u=new URL(t,baseHref())}catch(e){return {ok:false,reason:'not a valid web address'}}
+  if(u.protocol!=='https:'&&u.protocol!=='http:')return {ok:false,reason:'only https:// addresses are allowed, not '+u.protocol};
+  if(u.username||u.password)return {ok:false,reason:'it contains a user name or password'};
+  if(!u.hostname)return {ok:false,reason:'it has no host name'};
+  if(!/^[a-z0-9.\-]+$|^\[[0-9a-f:.]+\]$/i.test(u.hostname))return {ok:false,reason:'not a valid web address'};
+  if(u.protocol==='http:'&&!(pageIsWeb()&&u.origin===location.origin))return {ok:false,reason:'it must start with https://'};
+  u.hash='';
+  return {ok:true,raw:t,href:u.href};
+}
+function defaultHref(){return normUrl(DEFAULT_URL).href}
+function bust(href){try{var u=new URL(href);u.searchParams.set('_ts',String(Date.now()));return u.href}catch(e){return null}}
 var inflight=false;
 function check(){
   if(state.source==='file'||inflight)return Promise.resolve();
+  var url=state.url,href=state.href,req=href&&bust(href);
+  if(!req){state.fresh=false;state.lastError='no usable ledger URL';state.lastCheck=Date.now();render();return Promise.resolve()}
   inflight=true;state.fetchCount++;
-  var url=state.url;
-  return fetch(bust(url),{cache:'no-store',credentials:'omit'}).then(function(res){
+  var p;
+  try{p=fetch(req,{cache:'no-store',credentials:'omit',redirect:'follow'})}catch(e){p=Promise.reject(e)}
+  return p.then(function(res){
     if(!res.ok)throw new Error('HTTP '+res.status);
     return res.text();
   }).then(function(txt){
@@ -394,30 +424,57 @@ function check(){
     var bad=validate(obj);if(bad)throw new Error('rejected ledger: '+bad);
     if(state.source==='file'||url!==state.url)return;
     state.data=obj;state.source='fetch';state.fresh=true;state.lastError=null;state.lastGood=Date.now();
-    lsSet(K_CACHE,{url:url,at:state.lastGood,data:obj});
+    lsSet(K_CACHE,{url:href,at:state.lastGood,data:obj});
   }).catch(function(err){
     if(state.source==='file'||url!==state.url)return;
     state.fresh=false;state.lastError=String(err&&err.message||err);
-  }).then(function(){inflight=false;state.lastCheck=Date.now();render()});
+  }).then(function(){inflight=false;state.lastCheck=Date.now();try{render()}catch(e){}},function(){inflight=false});
 }
-function loadCache(){var c=lsGet(K_CACHE);if(c&&c.url===state.url&&c.data&&!validate(c.data)){state.data=c.data;state.source='cache';state.fresh=false;state.lastGood=c.at||null}}
+function loadCache(){var c=lsGet(K_CACHE);if(!c||c.__corrupt){if(c)lsDel(K_CACHE);return}var n=normUrl(c.url);if(n.ok&&n.href===state.href&&c.data&&!validate(c.data)){state.data=c.data;state.source='cache';state.fresh=false;state.lastGood=c.at||null}}
+// Pick the ledger URL at start-up. A bad saved value is repaired (or discarded) here, never passed to fetch.
+function applyStoredUrl(){
+  var s=lsGet(K_SET),raw=s&&!s.__corrupt&&typeof s==='object'?s.url:undefined,n=normUrl(raw);
+  state.urlNotice=null;
+  if(s&&s.__corrupt){state.urlNotice='Saved settings were unreadable and have been reset. Using '+DEFAULT_URL+'.';lsSet(K_SET,{url:DEFAULT_URL,build:BUILD})}
+  else if(s&&!n.ok&&!n.empty){state.urlNotice='Saved ledger URL “'+maskUrl(raw)+'” was not usable ('+n.reason+') and has been reset to '+DEFAULT_URL+'.';lsSet(K_SET,{url:DEFAULT_URL,build:BUILD})}
+  else if(s&&n.empty&&raw!==undefined&&raw!==''){state.urlNotice='Saved ledger URL was blank and has been reset to '+DEFAULT_URL+'.';lsSet(K_SET,{url:DEFAULT_URL,build:BUILD})}
+  if(n.ok){state.url=n.raw;state.href=n.href;if(n.raw!==raw)lsSet(K_SET,{url:n.raw,build:BUILD})}
+  else{state.url=DEFAULT_URL;state.href=defaultHref()}
+}
+// Cache breaker: compare this page's build with the published one; offer a reload that bypasses the 10-minute page cache.
+function checkUpdate(){
+  if(!pageIsWeb())return;
+  var u;try{u=new URL(location.pathname,location.href);u.searchParams.set('_v',String(Date.now()))}catch(e){return}
+  try{fetch(u.href,{cache:'no-store',credentials:'omit'}).then(function(r){return r.ok?r.text():''}).then(function(t){var m=/<meta name="opschief-build" content="([^"]+)"/.exec(t||'');if(m&&m[1]!==BUILD){state.newBuild=m[1];render()}}).catch(function(){})}catch(e){}
+}
+function reloadFresh(){try{var u=new URL(location.pathname,location.href);u.searchParams.set('v',state.newBuild||String(Date.now()));location.replace(u.href)}catch(e){location.reload()}}
 function boot(){
-  var s=lsGet(K_SET);state.url=(s&&typeof s.url==='string'&&s.url)?s.url:DEFAULT_URL;
+  state.offsite=!pageIsWeb();
+  applyStoredUrl();
   $('url').value=state.url;
+  $('buildId').textContent=BUILD;$('loadedAt').textContent=berlin(Date.now());
+  var sa=false;try{sa=navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)}catch(e){}
+  $('pageMode').textContent=(state.offsite?'opened outside the web address':(sa?'home-screen app':'browser tab'));
   loadCache();render();check();
   setInterval(function(){check();render()},REFRESH_MS);
-  document.addEventListener('visibilitychange',function(){if(!document.hidden)check()});
+  setTimeout(checkUpdate,4000);setInterval(checkUpdate,UPDATE_MS);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){check();checkUpdate()}});
 }
 $('saveLoad').addEventListener('click',function(){
-  var u=($('url').value||'').trim()||DEFAULT_URL;
-  state.url=u;lsSet(K_SET,{url:u});
+  var raw=$('url').value||'',n=normUrl(raw),err=$('urlError');
+  if(!n.ok&&!n.empty){err.hidden=false;err.textContent='Not saved: “'+maskUrl(raw)+'” — '+n.reason+'. Use ./ledger.json or a full https:// address.';return}
+  err.hidden=true;err.textContent='';
+  if(!n.ok)n=normUrl(DEFAULT_URL);
+  state.url=n.raw;state.href=n.href;state.urlNotice=null;lsSet(K_SET,{url:n.raw,build:BUILD});
+  $('url').value=n.raw;
   state.source=null;state.data=null;state.fileName=null;state.lastError=null;state.fresh=false;inflight=false;
   $('file').value='';
   loadCache();render();check();
 });
 $('refreshNow').addEventListener('click',function(){check()});
+$('banners').addEventListener('click',function(e){if(e.target&&e.target.id==='reloadFresh')reloadFresh()});
 $('resetUrl').addEventListener('click',function(){$('url').value=DEFAULT_URL});
-$('clearStore').addEventListener('click',function(){lsDel(K_SET);lsDel(K_CACHE);$('url').value=DEFAULT_URL;state.url=DEFAULT_URL;render()});
+$('clearStore').addEventListener('click',function(){lsDel(K_SET);lsDel(K_CACHE);$('url').value=DEFAULT_URL;state.url=DEFAULT_URL;state.href=defaultHref();state.urlNotice=null;render()});
 $('file').addEventListener('change',function(ev){
   var f=ev.target.files&&ev.target.files[0];if(!f)return;
   var rd=new FileReader();
