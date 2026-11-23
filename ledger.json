@@ -24,7 +24,7 @@
         "sizing": "whole shares, floor(equity / entry price), long or short, no leverage",
         "hit_threshold": 0.01
     },
-    "updated_at": "2026-11-23T14:27:07Z",
+    "updated_at": "2026-11-23T14:41:56Z",
     "sessions": [
         {
             "date": "2026-11-20",
@@ -59,7 +59,9 @@
             },
             "calls_locked_at": "2026-11-23T09:17:27Z",
             "action": "NO_TRADE",
-            "status": "PENDING"
+            "status": "NO_TRADE",
+            "open_ref": 158.11,
+            "spy_open_ref": 721.34
         }
     ]
 }
