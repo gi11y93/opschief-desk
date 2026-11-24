@@ -24,7 +24,7 @@
         "sizing": "whole shares, floor(equity / entry price), long or short, no leverage",
         "hit_threshold": 0.01
     },
-    "updated_at": "2026-11-23T20:55:36Z",
+    "updated_at": "2026-11-24T14:36:19Z",
     "sessions": [
         {
             "date": "2026-11-20",
@@ -64,6 +64,18 @@
             "spy_open_ref": 721.34,
             "close_ref": 159.58,
             "spy_close_ref": 722.55
+        },
+        {
+            "date": "2026-11-24",
+            "ticker": "PLTR",
+            "calls": {
+                "FOUNDRY": "DOWN",
+                "COMPASS": "NONE",
+                "JACK": "NONE"
+            },
+            "calls_locked_at": "2026-11-24T07:12:18Z",
+            "action": "NO_TRADE",
+            "status": "PENDING"
         }
     ]
 }
