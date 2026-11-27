@@ -24,7 +24,7 @@
         "sizing": "whole shares, floor(equity / entry price), long or short, no leverage",
         "hit_threshold": 0.01
     },
-    "updated_at": "2026-11-27T16:03:52Z",
+    "updated_at": "2026-11-27T16:35:46Z",
     "sessions": [
         {
             "date": "2026-11-20",
@@ -114,9 +114,9 @@
             "shares": 6,
             "entry_price": 169.44,
             "entry_time": "2026-11-27T14:32:00Z",
-            "mark": 171.02,
-            "mark_time": "2026-11-27T16:03:00Z",
-            "spy_mark": 725.46
+            "mark": 173.08,
+            "mark_time": "2026-11-27T16:35:00Z",
+            "spy_mark": 726.7
         }
     ]
 }
